@@ -1,0 +1,17 @@
+tinyCNN 开发进展
+
+2016/12/08
+跑通建立model的流程，需要将所有的log信息用logging模块替换，方便debug
+
+2017/01/07
+所有layer的forward为一个不定长参数X_lists,由不同type的leyer内部来决定需要几个输入的数据。通常只需要一个， 若不满足的需要进行assert
+所有layer的foward输出均为tuple, tuple中的元素为shape为(N, C,H ,W)的张量
+
+
+2017/01/08
+反向传播完成，待测试
+
+2017/01/15
+完成了loss函数和loss 层代码编写
+2017/02/15
+开始进行solver类的编写，参考assignment2中的solver，用于梯度更新
