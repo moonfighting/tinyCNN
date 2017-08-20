@@ -7,7 +7,7 @@ version  = sys.version_info[0]
 if version  < 3:
     import cPickle as pk
 else:
-    import pickle pk
+    import pickle as pk
 
 logging.basicConfig(level = logging.DEBUG,
                     format = '%(asctime)s %(filename)s[line:%(lineno)d] %(levelname)s %(message)s',
@@ -42,14 +42,20 @@ class tinyCNNModel(object):
         :param model_path:  the model path to save in
         :return: 
         """
-        with open(model_path, 'w') as fp:
+        dumped_dict = {}
+        with open(model_path, 'wb') as fp:
+
             for layer_name in self.layer_name_dict:
                 if self.layer_name_dict[layer_name].type in Layers_with_weights:
-                    try:
-                        pk.dump(self.layer_name_dict[layer_name], fp)
-                    except:
-                        logging.error('dump layer {0} failed'.format(layer_name))
+                    weights = {}
+                    weights['W'] = self.layer_name_dict[layer_name].W
+                    weights['b'] = self.layer_name_dict[layer_name].b
+                    dumped_dict[layer_name] = weights
 
+            try:
+                pk.dump(dumped_dict, fp)
+            except:
+                logging.error('dump layer {0} failed'.format(layer_name))
 
     def load_model(self, model_path):
         """
@@ -59,8 +65,10 @@ class tinyCNNModel(object):
         with open(model_path, 'rb') as fp:
             model_layers = pk.load(fp)
             for layer_name in model_layers:
-                self.layer_name_dict[layer_name] = model_layers[layer_name]
-                
+                self.layer_name_dict[layer_name].W = model_layers[layer_name]['W']
+                self.layer_name_dict[layer_name].b = model_layers[layer_name]['b']
+
+
 
 
     def add_layer(self, layer, bottom_layer_name = ''):
